@@ -31,8 +31,8 @@ function GuestStak() {
 export default App = () => {
   return (
     <NavigationContainer>
-      {/* <RootStack /> */}
-      <GuestStak />
+      <RootStack /> 
+      {/* <GuestStak /> */}
     </NavigationContainer>
   );
 };
