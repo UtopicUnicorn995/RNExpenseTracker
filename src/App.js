@@ -19,7 +19,7 @@ function RootStack() {
   );
 }
 
-function GuestStak() {
+function GuestStack() {
   return (
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen name="Login" component={Login} options={options} />
@@ -31,8 +31,8 @@ function GuestStak() {
 export default App = () => {
   return (
     <NavigationContainer>
-      <RootStack /> 
-      {/* <GuestStak /> */}
+      {/* <RootStack />  */}
+      <GuestStack />
     </NavigationContainer>
   );
 };
