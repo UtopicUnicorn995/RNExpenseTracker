@@ -4,10 +4,10 @@ import {useLinkBuilder, useTheme} from '@react-navigation/native';
 import {PlatformPressable} from '@react-navigation/elements';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import IOIcon from 'react-native-vector-icons/Ionicons';
-import Calendar from '../screens/Calendar';
-import Home from '../screens/Home';
-import Graph from '../screens/Graph';
-import Profile from '../screens/Profile';
+import Calendar from '../screens/users/Calendar';
+import Home from '../screens/users/Home';
+import Graph from '../screens/users/Graph';
+import Profile from '../screens/users/Profile';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import CustomHeader from './CustomHeader';
 

@@ -1,8 +1,8 @@
 import {View, Text, StyleSheet} from 'react-native';
-import MainContainer from '../components/MainContainer';
+import MainContainer from '../../components/MainContainer';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import Card from '../components/Card';
-import Colors from '../utility/Colors';
+import Card from '../../components/Card';
+import Colors from '../../utility/Colors';
 
 export default Home = () => {
   return (
