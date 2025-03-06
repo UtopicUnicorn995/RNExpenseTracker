@@ -10,6 +10,7 @@ import {useColorScheme} from 'react-native';
 import Colors from '../utility/Colors';
 import MAIcons from 'react-native-vector-icons/MaterialIcons';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import Animated from 'react-native-reanimated';
 
 export default function Button({
   title,
