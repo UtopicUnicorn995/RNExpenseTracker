@@ -5,6 +5,8 @@ import Tabs from './components/Tabs';
 import Login from './screens/guests/Login';
 import Register from './screens/guests/Register';
 import Welcome from './screens/guests/Welcome';
+import {AppProvider} from './AppContext';
+import {UserProvider} from './UserContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,9 +34,13 @@ function GuestStack() {
 
 export default App = () => {
   return (
-    <NavigationContainer>
-      {/* <RootStack />  */}
-      <GuestStack />
-    </NavigationContainer>
+    <AppProvider>
+      <UserProvider>
+        <NavigationContainer>
+          {/* <RootStack />  */}
+          <GuestStack />
+        </NavigationContainer>
+      </UserProvider>
+    </AppProvider>
   );
 };

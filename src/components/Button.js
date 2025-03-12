@@ -6,10 +6,10 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-import {useColorScheme} from 'react-native';
+import {useColorScheme, Image} from 'react-native';
 import Colors from '../utility/Colors';
 import MAIcons from 'react-native-vector-icons/MaterialIcons';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Animated from 'react-native-reanimated';
 
 export default function Button({
@@ -22,6 +22,7 @@ export default function Button({
   iconOnly = false,
   style = {},
   textStyle = {},
+  imageSource,
 }) {
   const theme = useColorScheme();
 
@@ -50,6 +51,9 @@ export default function Button({
               color={disabled ? '#ccc' : Colors.primaryTextColor}
             />
           )}
+          {imageSource && (
+            <Image style={styles.imageIcon} source={imageSource} />
+          )}
           {!iconOnly && <Text style={[styles.text, textStyle]}>{title}</Text>}
         </View>
       )}
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
   },
   iconOnly: {
     alignSelf: 'flex-start',
-    marginBottom: hp('2%')
+    marginBottom: hp('2%'),
   },
   lightButton: {
     backgroundColor: '#007bff',
@@ -92,8 +96,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
+  imageIcon: {
+    width: hp('3%'),
+    height: hp('3%'),
+  },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: hp('1%'),
   },
 });

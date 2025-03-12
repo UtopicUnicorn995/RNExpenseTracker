@@ -10,7 +10,6 @@ export default function MainContainer({
   showsVerticalScrollIndicator,
   stylesProp,
 }) {
-  console.log('style props', stylesProp);
 
   if (hasScrollView) {
     return (

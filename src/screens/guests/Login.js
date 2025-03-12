@@ -6,16 +6,30 @@ import Colors from '../../utility/Colors';
 import Button from '../../components/Button';
 import googleImg from '../../assets/Google.png';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { useUser } from '../../UserContext';
+import {jwtDecode} from 'jwt-decode'
 
 export default function Login({route}) {
   const navigation = useNavigation();
   const canGoBack = navigation.canGoBack();
+  const {loginUser} = useUser()
 
   const [credentials, setCredentials] = useState({
-    email: '',
+    username: '',
     password: '',
   });
-  console.log('credentials', canGoBack);
+  console.log('credentials', credentials);
+
+  const handleLoginInputChange = (field, value) => {
+    setCredentials(prevState => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  const handleLogin = () => {
+    loginUser(credentials.username, credentials.password);
+  };
 
   return (
     <MainContainer
@@ -43,17 +57,12 @@ export default function Login({route}) {
         </View>
         <View style={styles.inputContainer}>
           <View style={styles.inputGroup}>
-            <Text style={styles.inputText}>E-mail</Text>
+            <Text style={styles.inputText}>Username</Text>
             <TextInput
-              placeholder="Enter your email"
+              placeholder="Enter your username"
               style={styles.inputBox}
               value={credentials.email}
-              onChangeText={text =>
-                setCredentials(prevState => ({
-                  ...prevState,
-                  email: text,
-                }))
-              }
+              onChangeText={text => handleLoginInputChange('username', text)}
             />
           </View>
           <View style={styles.inputGroup}>
@@ -62,18 +71,12 @@ export default function Login({route}) {
               placeholder="Enter your password"
               style={styles.inputBox}
               value={credentials.password}
-              onChangeText={text =>
-                setCredentials(prevState => ({
-                  ...prevState,
-                  password: text,
-                }))
-              }
+              onChangeText={text => handleLoginInputChange('password', text)}
             />
           </View>
         </View>
         <View style={styles.inputUtilityContainer}>
-          <View style={{width: '50%'}}>
-          </View>
+          <View style={{width: '50%'}}></View>
           <View style={{width: '50%'}}>
             <Text style={[styles.subText, {textAlign: 'right'}]}>
               Forgot password?
@@ -84,7 +87,7 @@ export default function Login({route}) {
           <Button
             style={{borderColor: '#007bff'}}
             title="Login"
-            // onPress={() => navigation.navigate('Login')}
+            onPress={handleLogin}
           />
           <View>
             <Text style={{textAlign: 'center', color: Colors.subTextColor}}>
