@@ -1,80 +1,168 @@
 import SQLite from 'react-native-sqlite-storage';
 
-const db = SQLite.openDatabase(
-  { name: 'expenseTracker.db', location: 'default' },
-  () => console.log('Database opened'),
-  error => console.error('Database error:', error)
-);
+SQLite.DEBUG(true);
+SQLite.enablePromise(true);
 
-if (!db) {
-  console.error("Database is not initialized!");
-}
+export const initDB = async () => {
+  try {
+    const db = await SQLite.openDatabase({
+      name: 'expenseTracker.db',
+      location: 'default',
+    });
 
-// Function to create the users table
-export const createUserTable = () => {
-  db.transaction(tx => {
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        is_active INTEGER DEFAULT 1,
-        role TEXT DEFAULT 'user'
-      )`,
-      [],
-      () => console.log('Users table created'),
-      error => console.error('Table creation error:', error)
-    );
-  });
+    console.log('Database opened successfully');
+    await createUserTable(db);
+
+    return db;
+  } catch (error) {
+    console.error('Failed to open database:', error);
+    return null;
+  }
 };
 
-// Function to insert or update a user
-export const saveUser = (userId, username, email, password) => {
-  db.transaction(tx => {
-    tx.executeSql(
-      'INSERT OR REPLACE INTO users (id, username, email, password) VALUES (?, ?, ?, ?)',
-      [userId, username, email, password],
-      () => console.log('User saved to SQLite'),
-      error => console.error('Save user error:', error)
-    );
-  });
+export const createUserTable = async (db) => {
+  if (!db) {
+    console.error('Database object is undefined');
+    return;
+  }
+
+  try {
+    await db.transaction(async (tx) => {
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT NOT NULL UNIQUE,
+          email TEXT NOT NULL UNIQUE,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          is_active INTEGER DEFAULT 1,
+          role TEXT DEFAULT 'user'
+        );`,
+        [],
+        (tx, results) => {
+          console.log('Users table created successfully!');
+        },
+        (tx, error) => {
+          console.error('Failed to create users table:', error);
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Transaction error:', error);
+  }
 };
 
-// Function to get a user from the database
-export const getUser = (callback) => {
-  db.transaction(tx => {
+export const logUsersTable = async (db) => {
+  if (!db) {
+    console.error('Database is undefined');
+    return;
+  }
+
+  db.transaction((tx) => {
     tx.executeSql(
-      'SELECT * FROM users LIMIT 1',
+      'SELECT * FROM users',
       [],
-      (_, result) => {
-        if (result.rows.length > 0) {
-          callback(result.rows.item(0));
+      (tx, results) => {
+        const len = results.rows.length;
+        if (len > 0) {
+          let users = [];
+          for (let i = 0; i < len; i++) {
+            users.push(results.rows.item(i));
+          }
+          console.log('📋 Users table:', users);
         } else {
-          callback(null);
+          console.log('📋 Users table is empty');
         }
       },
-      error => {
-        console.error('Get user error:', error);
-        callback(null);
+      (tx, error) => {
+        console.error('Error fetching users table:', error);
       }
     );
   });
 };
 
-// Function to delete all users (log out)
-export const clearUser = () => {
-  db.transaction(tx => {
-    tx.executeSql(
-      'DELETE FROM users',
-      [],
-      () => console.log('User removed from SQLite'),
-      error => console.error('Clear user error:', error)
-    );
+
+export const saveUser = async (db, userId, username, email) => {
+  if (!db) {
+    console.error('Database is undefined');
+    return;
+  }
+
+  console.log('here has db.', db)
+  try {
+    await db.transaction(async (tx) => {
+      tx.executeSql(
+        'INSERT OR REPLACE INTO users (id, username, email) VALUES (?, ?, ?)',
+        [userId, username, email],
+        async (tx, results) => {
+          console.log('User saved to SQLite');
+          await logUsersTable(db)
+        },
+        async (tx, error) => {
+          console.error('Save user error:', error);
+          await logUsersTable(db)
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Transaction error:', error);
+  }
+};
+
+export const getUser = async (db) => {
+  if (!db) {
+    console.error('Database is undefined');
+    return null;
+  }
+  console.log('here has db2.', db)
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM users LIMIT 1',
+        [],
+        async (tx, results) => {
+          if (results.rows.length > 0) {
+            const item = results.rows.item(0);
+            console.log('Got user:', item);
+            resolve(item);
+          } else {
+            console.log('No user found');
+            resolve(null);
+          }
+          await logUsersTable(db)
+        },
+        async (tx, error) => {
+          console.error('Get user error:', error);
+          reject(error);
+          await logUsersTable(db)
+        }
+      );
+    });
   });
 };
 
-// Export the database instance
-export default db;
+export const clearUser = async (db) => {
+  if (!db) {
+    console.error('Database is undefined');
+    return;
+  }
+
+  try {
+    await db.transaction(async (tx) => {
+      tx.executeSql(
+        'DELETE FROM users',
+        [],
+        async (tx, results) => {
+          console.log('User removed from SQLite', results);
+          await logUsersTable(db)
+        },
+        async (tx, error) => {
+          console.error('Clear user error:', error);
+          await logUsersTable(db)
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Transaction error:', error);
+  }
+};

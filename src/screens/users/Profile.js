@@ -1,10 +1,23 @@
 import {View, Text} from 'react-native';
+import MainContainer from '../../components/MainContainer';
+import Button from '../../components/Button';
+import {clearUser} from '../../database/userDatabase';
+import {useApp} from '../../AppContext';
+import {useUser} from '../../UserContext';
 
 export default function Profile() {
-    console.log('foo')
+  const {db} = useApp();
+  const {setUserData} = useUser();
+
   return (
-    <View>
-      <Text>Hello from the Profle section</Text>
-    </View>
+    <MainContainer>
+      <Button
+        title="Logout"
+        onPress={async () => {
+          await clearUser(db);
+          setUserData(null);
+        }}
+      />
+    </MainContainer>
   );
 }

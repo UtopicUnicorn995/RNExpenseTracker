@@ -78,11 +78,17 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginBottom: hp('2%'),
   },
+  whiteButton: {
+    backgroundColor: Colors.whiteColor,
+    borderColor: Colors.whiteColor,
+  },
   lightButton: {
     backgroundColor: '#007bff',
+    borderColor:'#007bff'
   },
   darkButton: {
     backgroundColor: '#0056b3',
+     borderColor:'#0056b3'
   },
   pressed: {
     opacity: 0.75,

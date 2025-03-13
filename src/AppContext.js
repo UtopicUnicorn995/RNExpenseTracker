@@ -1,26 +1,32 @@
-import { createContext, useEffect, useState, useContext } from 'react';
-import SQLite from 'react-native-sqlite-storage';
-import db, { createUserTable, getUser, saveUser } from './database/userDatabase';
-import axios from 'axios';
+import {createContext, useEffect, useState, useContext} from 'react';
+import {initDB} from './database/userDatabase'; // This is where you open DB + create tables
 
-// App-wide context
-export const AppContext = createContext();
+export const AppContext = createContext(null);
 
-export const AppProvider = ({ children }) => {
-  const apiUrl = 'http://192.168.1.12:3000/api';
+export const AppProvider = ({children}) => {
+  const apiUrl = 'http://192.168.30.182:3000/api';
+  const [db, setDb] = useState(null);
 
   useEffect(() => {
-    createUserTable();
+    const setup = async () => {
+      const database = await initDB();
+      setDb(database);
+    };
+
+    setup();
   }, []);
 
+  if (!db) {
+    return null;
+  }
+
   return (
-    <AppContext.Provider value={{ db, apiUrl }}>
+    <AppContext.Provider value={{db, apiUrl}}>
       {children}
     </AppContext.Provider>
   );
 };
 
-// Hook to access AppContext
 export const useApp = () => {
   return useContext(AppContext);
 };

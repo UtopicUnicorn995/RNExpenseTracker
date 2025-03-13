@@ -5,8 +5,8 @@ import Tabs from './components/Tabs';
 import Login from './screens/guests/Login';
 import Register from './screens/guests/Register';
 import Welcome from './screens/guests/Welcome';
-import {AppProvider} from './AppContext';
-import {UserProvider} from './UserContext';
+import { AppProvider } from './AppContext';
+import {UserProvider, useUser} from './UserContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,7 +14,7 @@ const options = {
   headerShown: false,
 };
 
-function RootStack() {
+function AuthenticatedStack() {
   return (
     <Stack.Navigator initialRouteName="MainTabs">
       <Stack.Screen name="MainTabs" component={Tabs} options={options} />
@@ -32,15 +32,23 @@ function GuestStack() {
   );
 }
 
-export default App = () => {
+function RootNavigator() {
+  const {user} = useUser();
+
+  console.log('Logged in user:', user);
+  return user ? <AuthenticatedStack /> : <GuestStack />;
+}
+
+const App = () => {
   return (
     <AppProvider>
       <UserProvider>
         <NavigationContainer>
-          {/* <RootStack />  */}
-          <GuestStack />
+          <RootNavigator /> 
         </NavigationContainer>
       </UserProvider>
     </AppProvider>
   );
 };
+
+export default App

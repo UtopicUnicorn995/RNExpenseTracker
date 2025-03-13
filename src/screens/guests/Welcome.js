@@ -81,7 +81,10 @@ export default function Welcome() {
           />
           <Button
             title="Create account"
-            style={{backgroundColor: Colors.whiteColor}}
+            style={{
+              backgroundColor: Colors.whiteColor,
+              borderColor: Colors.primaryTextColor,
+            }}
             textStyle={{color: Colors.primaryTextColor}}
             onPress={() => navigation.navigate('Register')}
           />

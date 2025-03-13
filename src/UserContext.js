@@ -2,13 +2,13 @@ import { createContext, useState, useContext } from 'react';
 import { getUser, saveUser } from './database/userDatabase';
 import axios from 'axios';
 import { useApp } from './AppContext';
+import { jwtDecode } from "jwt-decode";
 
-// Create User Context
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const { apiUrl } = useApp(); // ✅ Now we can use apiUrl safely
+  const { apiUrl, db } = useApp();
 
   console.log('User Data:', user);
 
@@ -16,9 +16,13 @@ export const UserProvider = ({ children }) => {
     setUser(userData);
   };
 
+  const decodeUser = (token) => {
+    return jwtDecode(token)
+  }
+
   const loginUser = async (username, password) => {
     try {
-      const localUser = await getUser();
+      const localUser = await getUser(db);
 
       if (localUser) {
         console.log('User already logged in locally:', localUser);
@@ -26,7 +30,7 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
-      console.log('User not found locally, attempting online login...');
+      console.log('User not found locally, attempting online login...', localUser);
       const payload = { username, password };
 
       const res = await axios.post(`${apiUrl}/users/login`, payload);
@@ -34,11 +38,11 @@ export const UserProvider = ({ children }) => {
       if (res.status === 200) {
         console.log('User logged in:', res.data);
 
-        const { userId, username, email, password } = res.data;
+        const {userId, username, email} = decodeUser(res.data.token)
 
         console.log('Saving user:', userId, username, email);
-        await saveUser(userId, username, email, password);
-        setUserData(res.data);
+        await saveUser(db, userId, username, email);
+        setUserData(decodeUser(res.data.token));
       } else {
         console.log('Login failed, check credentials');
       }
