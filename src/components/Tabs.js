@@ -137,7 +137,7 @@ export default function Tabs() {
         options={{
           header: () => (
             <CustomHeader
-              title="Profile"
+              // title="Profile"
               buttons={[
                 {
                   icon: 'settings',

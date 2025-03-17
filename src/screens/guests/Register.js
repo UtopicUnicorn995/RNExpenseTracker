@@ -20,10 +20,10 @@ import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import axios from 'axios';
 import {AppContext} from '../../AppContext';
 import {saveUser} from '../../database/userDatabase';
+import {useUser} from '../../UserContext';
 
-export default function Register({route}) {
+export default function Register() {
   const {apiUrl} = useContext(AppContext);
-  const {loginUser} = route.params
   const navigation = useNavigation();
   const [credentials, setCredentials] = useState({
     username: '',
@@ -32,24 +32,45 @@ export default function Register({route}) {
     reEnteredPassword: '',
   });
 
+  const {loginUser} = useUser();
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
 
   const canGoBack = navigation.canGoBack();
 
   const validation = () => {
     const {username, email, password, reEnteredPassword} = credentials;
-    if (!username || !email || !password || !reEnteredPassword) {
-      setError('All fields are required!');
-      return false;
+    let tempErrors = [];
+
+    if (!username) {
+      tempErrors.push({field: 'username', message: 'Username is required!'});
     }
 
-    if (password !== reEnteredPassword) {
-      setError('Passwords do not match!');
-      return false;
+    if (!email) {
+      tempErrors.push({field: 'email', message: 'Email is required!'});
     }
 
-    return true;
+    if (!password) {
+      tempErrors.push({field: 'password', message: 'Password is required!'});
+    }
+
+    if (!reEnteredPassword) {
+      tempErrors.push({
+        field: 'reEnteredPassword',
+        message: 'Please confirm your password!',
+      });
+    }
+
+    if (password && reEnteredPassword && password !== reEnteredPassword) {
+      tempErrors.push({
+        field: 'reEnteredPassword',
+        message: 'Passwords do not match!',
+      });
+    }
+
+    setErrors(tempErrors);
+    return tempErrors.length === 0;
   };
 
   const handleInputChange = (field, value) => {
@@ -57,19 +78,20 @@ export default function Register({route}) {
       ...prevState,
       [field]: value,
     }));
+    setErrors(prevErrors => prevErrors.filter(error => error.field !== field));
   };
 
   const registerUser = async () => {
-    // if (!validation()) return;
+    if (!validation()) return;
 
     const payLoad = {
       username: credentials.username,
       email: credentials.email,
       password: credentials.password,
     };
- 
+
     setLoading(true);
-    setError('');
+    setErrors([]);
 
     try {
       const res = await axios.post(`${apiUrl}/users/register`, payLoad);
@@ -82,17 +104,14 @@ export default function Register({route}) {
           credentials.email,
           credentials.password,
         );
-
-        loginUser(credentials.username, credentials.password)
-
-        Alert.alert('Success!', 'Account has been successfully created.', [
+        loginUser(credentials.username, credentials.password);
+      } else {
+        setErrors([
           {
-            text: 'Confirm',
-            onPress: () => navigation.navigate('Welcome'),
+            field: 'general',
+            message: 'Something went wrong, please try again!',
           },
         ]);
-      } else {
-        setError('Something went wrong, please try again!');
       }
     } catch (error) {
       console.error(
@@ -100,10 +119,20 @@ export default function Register({route}) {
         error.message,
         error.response?.data,
       );
-      setError('An error occurred while registering the user.');
+      setErrors([
+        {
+          field: 'general',
+          message: 'An error occurred while registering the user.',
+        },
+      ]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getErrorMessage = field => {
+    const errorObj = errors.find(error => error.field === field);
+    return errorObj ? errorObj.message : null;
   };
 
   return (
@@ -112,9 +141,10 @@ export default function Register({route}) {
         backgroundColor: Colors.whiteColor,
         marginTop: 0,
         paddingTop: hp('2%'),
+        // paddingBottom: hp('10%')
       }}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View>
+        <>
           <View style={styles.navContainer}>
             {canGoBack && (
               <Button
@@ -125,10 +155,13 @@ export default function Register({route}) {
               />
             )}
           </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <KeyboardAvoidingView
-              style={styles.container}
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ScrollView
+              contentContainerStyle={{flexGrow: 1}}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
               <View style={styles.register}>
                 <View style={styles.titleContainer}>
                   <Text style={styles.titleText}>Create an account</Text>
@@ -146,6 +179,11 @@ export default function Register({route}) {
                       value={credentials.username}
                       onChangeText={text => handleInputChange('username', text)}
                     />
+                    {getErrorMessage('username') && (
+                      <Text style={styles.errorText}>
+                        {getErrorMessage('username')}
+                      </Text>
+                    )}
                   </View>
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputText}>E-mail</Text>
@@ -155,6 +193,11 @@ export default function Register({route}) {
                       value={credentials.email}
                       onChangeText={text => handleInputChange('email', text)}
                     />
+                    {getErrorMessage('email') && (
+                      <Text style={styles.errorText}>
+                        {getErrorMessage('email')}
+                      </Text>
+                    )}
                   </View>
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputText}>Password</Text>
@@ -165,6 +208,11 @@ export default function Register({route}) {
                       onChangeText={text => handleInputChange('password', text)}
                       secureTextEntry
                     />
+                    {getErrorMessage('password') && (
+                      <Text style={styles.errorText}>
+                        {getErrorMessage('password')}
+                      </Text>
+                    )}
                   </View>
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputText}>Repeat password</Text>
@@ -177,6 +225,11 @@ export default function Register({route}) {
                       }
                       secureTextEntry
                     />
+                    {getErrorMessage('reEnteredPassword') && (
+                      <Text style={styles.errorText}>
+                        {getErrorMessage('reEnteredPassword')}
+                      </Text>
+                    )}
                   </View>
                 </View>
                 <View style={styles.buttonContainer}>
@@ -186,6 +239,11 @@ export default function Register({route}) {
                     onPress={registerUser}
                     disabled={loading}
                   />
+                  {getErrorMessage('general') && (
+                    <Text style={[styles.errorText, {textAlign: 'center'}]}>
+                      {getErrorMessage('general')}
+                    </Text>
+                  )}
                   <Text
                     style={{textAlign: 'center', color: Colors.subTextColor}}>
                     Or Register with
@@ -198,13 +256,12 @@ export default function Register({route}) {
                     }}
                     title="Google"
                     textStyle={{color: Colors.primaryTextColor, marginLeft: 0}}
-                    // onPress={() => navigation.navigate('Login')}
                   />
                 </View>
               </View>
-            </KeyboardAvoidingView>
-          </ScrollView>
-        </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </>
       </TouchableWithoutFeedback>
     </MainContainer>
   );
@@ -251,5 +308,10 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: hp('2%'),
     color: Colors.subTextColor,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: hp('1.5%'),
+    marginTop: 2,
   },
 });

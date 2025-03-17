@@ -5,8 +5,9 @@ import Tabs from './components/Tabs';
 import Login from './screens/guests/Login';
 import Register from './screens/guests/Register';
 import Welcome from './screens/guests/Welcome';
-import { AppProvider } from './AppContext';
+import {AppProvider} from './AppContext';
 import {UserProvider, useUser} from './UserContext';
+import {initDB, getUser} from './database/userDatabase';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,16 +40,19 @@ function RootNavigator() {
   return user ? <AuthenticatedStack /> : <GuestStack />;
 }
 
-const App = () => {
+const App = async () => {
+  // const db = await initDB();
+  // const user = await getUser(db);
+  // console.log('User at app start:', user);
   return (
     <AppProvider>
       <UserProvider>
         <NavigationContainer>
-          <RootNavigator /> 
+          <RootNavigator />
         </NavigationContainer>
       </UserProvider>
     </AppProvider>
   );
 };
 
-export default App
+export default App;

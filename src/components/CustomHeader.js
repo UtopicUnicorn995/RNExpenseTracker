@@ -14,7 +14,7 @@ export default function CustomHeader({title, buttons = []}) {
         alignItems: 'center',
         justifyContent: 'center',
         padding: hp('2%'),
-        paddingTop: hp('4%')
+        paddingTop: hp('4%'),
       }}>
       {/* {navigation.canGoBack() ? (
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -25,7 +25,9 @@ export default function CustomHeader({title, buttons = []}) {
       )} */}
 
       {/* Center: Title */}
-      <Text style={{fontSize: hp('2.5%'), fontWeight: 'bold'}}>{title}</Text>
+      {title && (
+        <Text style={{fontSize: hp('2.5%'), fontWeight: 'bold'}}>{title}</Text>
+      )}
 
       {/* Right: Dynamic Buttons */}
       {/* <View style={{flexDirection: 'row'}}>
