@@ -26,6 +26,8 @@ export default function Button({
 }) {
   const theme = useColorScheme();
 
+  console.log('thene', theme)
+
   return (
     <Pressable
       onPress={onPress}
@@ -84,11 +86,11 @@ const styles = StyleSheet.create({
   },
   lightButton: {
     backgroundColor: '#007bff',
-    borderColor:'#007bff'
+    // borderColor:'#007bff'
   },
   darkButton: {
     backgroundColor: '#0056b3',
-     borderColor:'#0056b3'
+    //  borderColor:'#0056b3'
   },
   pressed: {
     opacity: 0.75,

@@ -82,7 +82,9 @@ export default function Register() {
   };
 
   const registerUser = async () => {
+    console.log('checking muna');
     if (!validation()) return;
+    console.log('Valid so no worries');
 
     const payLoad = {
       username: credentials.username,
@@ -114,11 +116,9 @@ export default function Register() {
         ]);
       }
     } catch (error) {
-      console.error(
-        'Error during registration:',
-        error.message,
-        error.response?.data,
-      );
+      Alert.alert('Registration failed!', error.response?.data.error, [
+        {text: 'Okay', onPress: () => null, style: 'cancel'},
+      ]);
       setErrors([
         {
           field: 'general',
@@ -234,7 +234,7 @@ export default function Register() {
                 </View>
                 <View style={styles.buttonContainer}>
                   <Button
-                    style={{borderColor: '#007bff'}}
+                    style={{borderColor: 'transparent'}}
                     title="Sign Up"
                     onPress={registerUser}
                     disabled={loading}

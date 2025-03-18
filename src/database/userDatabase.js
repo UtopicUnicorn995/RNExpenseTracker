@@ -1,4 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
+import { Alert } from 'react-native';
 
 SQLite.DEBUG(true);
 SQLite.enablePromise(true);
@@ -88,24 +89,29 @@ export const saveUser = async (db, userId, username, email) => {
     return;
   }
 
-  console.log('here has db.', db)
+  console.log('here has db.', db);
+
   try {
-    await db.transaction(async (tx) => {
+    db.transaction((tx) => {
       tx.executeSql(
         'INSERT OR REPLACE INTO users (id, username, email) VALUES (?, ?, ?)',
         [userId, username, email],
-        async (tx, results) => {
+        (tx, results) => {
           console.log('User saved to SQLite');
-          await logUsersTable(db)
+          logUsersTable(db);
         },
-        async (tx, error) => {
+        (tx, error) => {
           console.error('Save user error:', error);
-          await logUsersTable(db)
+          logUsersTable(db);
         }
       );
+    }, (error) => {
+      console.error('Transaction error:', error);
+    }, () => {
+      console.log('Transaction completed successfully');
     });
   } catch (error) {
-    console.error('Transaction error:', error);
+    console.error('Outer transaction error:', error);
   }
 };
 

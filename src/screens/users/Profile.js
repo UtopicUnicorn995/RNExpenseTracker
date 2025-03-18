@@ -29,7 +29,7 @@ export default function Profile() {
           <Text style={styles.avatarName}>@Username</Text>
         </View>
       </View>
-      <Button title="Logout" onPress={logout} />
+      <Button style={{borderWidth: 0}} title="Logout" onPress={logout} />
     </MainContainer>
   );
 }

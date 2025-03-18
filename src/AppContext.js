@@ -4,7 +4,7 @@ import {initDB} from './database/userDatabase'; // This is where you open DB + c
 export const AppContext = createContext(null);
 
 export const AppProvider = ({children}) => {
-  const apiUrl = 'http://192.168.30.182:3000/api';
+  const apiUrl = 'http://192.168.1.12:3000/api';
   const [db, setDb] = useState(null);
 
   useEffect(() => {

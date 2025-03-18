@@ -1,24 +1,46 @@
-import { createContext, useState, useContext } from 'react';
-import { getUser, saveUser } from './database/userDatabase';
+import {createContext, useState, useEffect, useContext} from 'react';
+import {getUser, saveUser} from './database/userDatabase';
 import axios from 'axios';
-import { useApp } from './AppContext';
-import { jwtDecode } from "jwt-decode";
+import {useApp} from './AppContext';
+import {jwtDecode} from 'jwt-decode';
 
 const UserContext = createContext();
 
-export const UserProvider = ({ children }) => {
+export const UserProvider = ({children}) => {
   const [user, setUser] = useState(null);
-  const { apiUrl, db } = useApp();
+  const [loading, setLoading] = useState(true);
+  const {apiUrl, db} = useApp();
 
   console.log('User Data:', user);
 
-  const setUserData = (userData) => {
+  const setUserData = userData => {
     setUser(userData);
   };
 
-  const decodeUser = (token) => {
-    return jwtDecode(token)
+  useEffect(() => {
+    const checkLocalUser = async () => {
+      try {
+        const hasUser = await getUser(db);
+        if (hasUser) {
+          setUserData(hasUser);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user from local DB:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    checkLocalUser();
+  }, [db]);
+  
+  if (loading) {
+    return null;
   }
+
+  const decodeUser = token => {
+    return jwtDecode(token);
+  };
 
   const loginUser = async (username, password) => {
     try {
@@ -30,15 +52,18 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
-      console.log('User not found locally, attempting online login...', localUser);
-      const payload = { username, password };
+      console.log(
+        'User not found locally, attempting online login...',
+        localUser,
+      );
+      const payload = {username, password};
 
       const res = await axios.post(`${apiUrl}/users/login`, payload);
 
       if (res.status === 200) {
         console.log('User logged in:', res.data);
 
-        const {userId, username, email} = decodeUser(res.data.token)
+        const {userId, username, email} = decodeUser(res.data.token);
 
         console.log('Saving user:', userId, username, email);
         await saveUser(db, userId, username, email);
@@ -52,7 +77,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUserData, loginUser }}>
+    <UserContext.Provider value={{user, loading, setUserData, loginUser}}>
       {children}
     </UserContext.Provider>
   );

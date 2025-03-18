@@ -1,16 +1,12 @@
 import {View, Text, Image, StyleSheet, Alert, BackHandler} from 'react-native';
-import {useEffect, useContext} from 'react';
+import {useEffect} from 'react';
 import MainContainer from '../../components/MainContainer';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {useNavigation} from '@react-navigation/native';
 import Colors from '../../utility/Colors';
 import Button from '../../components/Button';
-import {AppContext} from '../../AppContext';
-import axios from 'axios';
-import {getUser, saveUser, clearUser} from '../../database/userDatabase';
 
 export default function Welcome() {
-  const {apiUrl} = useContext(AppContext);
   const navigation = useNavigation();
 
   useEffect(() => {

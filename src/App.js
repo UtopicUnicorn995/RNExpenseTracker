@@ -1,10 +1,11 @@
-import {View, Text} from 'react-native';
+import {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Tabs from './components/Tabs';
 import Login from './screens/guests/Login';
 import Register from './screens/guests/Register';
 import Welcome from './screens/guests/Welcome';
+import SplashScreen from './screens/guests/SplashScreen';
 import {AppProvider} from './AppContext';
 import {UserProvider, useUser} from './UserContext';
 import {initDB, getUser} from './database/userDatabase';
@@ -16,6 +17,7 @@ const options = {
 };
 
 function AuthenticatedStack() {
+  console.log('Authenticated stack');
   return (
     <Stack.Navigator initialRouteName="MainTabs">
       <Stack.Screen name="MainTabs" component={Tabs} options={options} />
@@ -24,6 +26,7 @@ function AuthenticatedStack() {
 }
 
 function GuestStack() {
+
   return (
     <Stack.Navigator initialRouteName="Welcome">
       <Stack.Screen name="Welcome" component={Welcome} options={options} />
@@ -34,22 +37,50 @@ function GuestStack() {
 }
 
 function RootNavigator() {
-  const {user} = useUser();
+  const {user, loading} = useUser();
+
+  console.log('loaddding');
+
+  if (loading) {
+    return <SplashScreen />
+  };
 
   console.log('Logged in user:', user);
-  return user ? <AuthenticatedStack /> : <GuestStack />;
+  return (
+    <NavigationContainer>
+      {user ? <AuthenticatedStack /> : <GuestStack />}
+    </NavigationContainer>
+  );
 }
 
-const App = async () => {
-  // const db = await initDB();
-  // const user = await getUser(db);
-  // console.log('User at app start:', user);
+const App = () => {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const prepareApp = async () => {
+      try {
+        const db = await initDB();
+        const user = await getUser(db);
+        console.log('DB initialized!', user);
+      } catch (error) {
+        console.error('Error during app init:', error);
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    prepareApp();
+  }, []);
+
+  if (!isReady) {
+    console.log('not ready pa');
+    return null;
+  }
+
   return (
     <AppProvider>
       <UserProvider>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
+        <RootNavigator />
       </UserProvider>
     </AppProvider>
   );
