@@ -1,7 +1,7 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import MainContainer from '../../components/MainContainer';
 import Button from '../../components/Button';
-import {clearUser} from '../../database/userDatabase';
+import {clearUser} from '../../database/userQueries';
 import {useApp} from '../../AppContext';
 import {useUser} from '../../UserContext';
 import MAIcons from 'react-native-vector-icons/MaterialIcons';

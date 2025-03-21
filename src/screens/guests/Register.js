@@ -19,7 +19,7 @@ import googleImg from '../../assets/Google.png';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import axios from 'axios';
 import {AppContext} from '../../AppContext';
-import {saveUser} from '../../database/userDatabase';
+import {saveUser} from '../../database/userQueries';
 import {useUser} from '../../UserContext';
 
 export default function Register() {

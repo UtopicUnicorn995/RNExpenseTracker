@@ -8,7 +8,8 @@ import Welcome from './screens/guests/Welcome';
 import SplashScreen from './screens/guests/SplashScreen';
 import {AppProvider} from './AppContext';
 import {UserProvider, useUser} from './UserContext';
-import {initDB, getUser} from './database/userDatabase';
+import {initDB} from './database/databaseSetup';
+import { getUser } from './database/userQueries';
 
 const Stack = createNativeStackNavigator();
 
@@ -60,6 +61,7 @@ const App = () => {
     const prepareApp = async () => {
       try {
         const db = await initDB();
+        console.log('Database object:', db);
         const user = await getUser(db);
         console.log('DB initialized!', user);
       } catch (error) {

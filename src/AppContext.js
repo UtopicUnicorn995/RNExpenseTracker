@@ -1,10 +1,10 @@
 import {createContext, useEffect, useState, useContext} from 'react';
-import {initDB} from './database/userDatabase'; // This is where you open DB + create tables
+import {initDB} from './database/databaseSetup'; // This is where you open DB + create tables
 
 export const AppContext = createContext(null);
 
 export const AppProvider = ({children}) => {
-  const apiUrl = 'http://192.168.1.12:3000/api';
+  const apiUrl = 'http://192.168.30.182:3000/api';
   const [db, setDb] = useState(null);
 
   useEffect(() => {
@@ -20,10 +20,9 @@ export const AppProvider = ({children}) => {
     return null;
   }
 
+  console.log('from app Context', db);
   return (
-    <AppContext.Provider value={{db, apiUrl}}>
-      {children}
-    </AppContext.Provider>
+    <AppContext.Provider value={{db, apiUrl}}>{children}</AppContext.Provider>
   );
 };
 

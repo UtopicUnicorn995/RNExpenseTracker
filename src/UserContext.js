@@ -1,5 +1,5 @@
 import {createContext, useState, useEffect, useContext} from 'react';
-import {getUser, saveUser} from './database/userDatabase';
+import {getUser, saveUser} from './database/userQueries';
 import axios from 'axios';
 import {useApp} from './AppContext';
 import {jwtDecode} from 'jwt-decode';
@@ -12,6 +12,7 @@ export const UserProvider = ({children}) => {
   const {apiUrl, db} = useApp();
 
   console.log('User Data:', user);
+  console.log('Database:', db); // Add logging to check db
 
   const setUserData = userData => {
     setUser(userData);
@@ -19,8 +20,15 @@ export const UserProvider = ({children}) => {
 
   useEffect(() => {
     const checkLocalUser = async () => {
+      if (!db) {
+        console.error('Database is not initialized');
+        setLoading(false);
+        return;
+      }
       try {
+        console.log('hass user before')
         const hasUser = await getUser(db);
+        console.log('hass user', hasUser)
         if (hasUser) {
           setUserData(hasUser);
         }
@@ -44,6 +52,11 @@ export const UserProvider = ({children}) => {
 
   const loginUser = async (username, password) => {
     try {
+      if (!db) {
+        console.error('Database is not initialized');
+        return;
+      }
+
       const localUser = await getUser(db);
 
       if (localUser) {
