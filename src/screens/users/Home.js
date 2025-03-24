@@ -1,13 +1,26 @@
+import {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import MainContainer from '../../components/MainContainer';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Card from '../../components/Card';
 import Colors from '../../utility/Colors';
+import {useUser} from '../../UserContext';
+import SplashScreen from '../guests/SplashScreen';
 
 export default Home = () => {
+  const {user} = useUser();
+
+  console.log('user dat', user);
+
+  if (!user) {
+    return <SplashScreen />;
+  }
+
   return (
     <MainContainer>
-      <Card cardBalance={'$23,345.43'} />
+      {/* <Card
+        user={user}
+      /> */}
       <View style={styles.activityContainer}>
         <Text style={styles.textBody}>Recent activity</Text>
         <Text style={styles.textBody}>View all</Text>
@@ -60,17 +73,17 @@ export default Home = () => {
   );
 };
 
-styles = StyleSheet.create({
-    activityContainer:{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        paddingTop: hp('2%'),
-        paddingHorizontal: hp('2%')
-    },
-    textBody:{
-        color: Colors.primaryTextColor,
-        fontSize: hp('2.25%'),
-        fontWeight: 'bold'
-    }
-})
+const styles = StyleSheet.create({
+  activityContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingTop: hp('2%'),
+    paddingHorizontal: hp('2%'),
+  },
+  textBody: {
+    color: Colors.primaryTextColor,
+    fontSize: hp('2.25%'),
+    fontWeight: 'bold',
+  },
+});

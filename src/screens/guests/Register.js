@@ -18,12 +18,12 @@ import Button from '../../components/Button';
 import googleImg from '../../assets/Google.png';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import axios from 'axios';
-import {AppContext} from '../../AppContext';
+import { useApp } from '../../AppContext';
 import {saveUser} from '../../database/userQueries';
 import {useUser} from '../../UserContext';
 
 export default function Register() {
-  const {apiUrl} = useContext(AppContext);
+  const {apiUrl, db} = useApp();
   const navigation = useNavigation();
   const [credentials, setCredentials] = useState({
     username: '',
@@ -101,10 +101,13 @@ export default function Register() {
       if (res.status === 201) {
         console.log(res.data);
         await saveUser(
+          db,
           res.data.userId,
           credentials.username,
           credentials.email,
-          credentials.password,
+          credentials.available_balance,
+          credentials.account_number,
+          credentials.role,
         );
         loginUser(credentials.username, credentials.password);
       } else {

@@ -11,10 +11,10 @@ export const UserProvider = ({children}) => {
   const [loading, setLoading] = useState(true);
   const {apiUrl, db} = useApp();
 
-  console.log('User Data:', user);
-  console.log('Database:', db); // Add logging to check db
+  console.log('user', user);
 
   const setUserData = userData => {
+    console.log('setting user data', userData);
     setUser(userData);
   };
 
@@ -26,9 +26,8 @@ export const UserProvider = ({children}) => {
         return;
       }
       try {
-        console.log('hass user before')
         const hasUser = await getUser(db);
-        console.log('hass user', hasUser)
+
         if (hasUser) {
           setUserData(hasUser);
         }
@@ -38,10 +37,10 @@ export const UserProvider = ({children}) => {
         setLoading(false);
       }
     };
-  
+
     checkLocalUser();
   }, [db]);
-  
+
   if (loading) {
     return null;
   }
@@ -60,7 +59,6 @@ export const UserProvider = ({children}) => {
       const localUser = await getUser(db);
 
       if (localUser) {
-        console.log('User already logged in locally:', localUser);
         setUserData(localUser);
         return;
       }
@@ -74,12 +72,18 @@ export const UserProvider = ({children}) => {
       const res = await axios.post(`${apiUrl}/users/login`, payload);
 
       if (res.status === 200) {
-        console.log('User logged in:', res.data);
-
-        const {userId, username, email} = decodeUser(res.data.token);
-
-        console.log('Saving user:', userId, username, email);
-        await saveUser(db, userId, username, email);
+        const {userId, username, email, availableBalance, accountNumber, role} =
+          decodeUser(res.data.token);
+        await saveUser(
+          db,
+          userId,
+          username,
+          email,
+          availableBalance,
+          accountNumber,
+          role,
+        );
+        console.log('decoded user:', decodeUser(res.data.token));
         setUserData(decodeUser(res.data.token));
       } else {
         console.log('Login failed, check credentials');

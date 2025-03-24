@@ -6,7 +6,20 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../utility/Colors';
 
-export default function Card({cardNumber, cardBalance}) {
+export default function Card({user}) {
+  console.log(
+    'cardNumber',
+    user.account_number,
+    'cardBalance',
+    user.available_balance,
+    user,
+  );
+
+  const displayCardNumber =
+    user.account_number !== undefined ? user.account_number : '374245455400126';
+  const displayCardBalance =
+    user.available_balance !== undefined ? user.available_balance : 2334543;
+
   return (
     <View style={styles.cardContainer}>
       <View
@@ -30,11 +43,11 @@ export default function Card({cardNumber, cardBalance}) {
         <View>
           <Text style={styles.cardTitleText}>Total Balance</Text>
           <Text style={styles.cardBalanceText}>
-            {formatBalance(cardBalance ? cardBalance : 2334543)}
+            {formatBalance(displayCardBalance)}
           </Text>
         </View>
         <View style={styles.cardNumberContainer}>
-          <MaskedNumber number={cardNumber ? cardNumber : '374245455400126'} />
+          <MaskedNumber number={displayCardNumber} />
           <Image
             style={styles.imgStyle}
             source={require('../assets/Eclispe.png')}
@@ -87,7 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: hp('5%'),
     paddingHorizontal: hp('1%'),
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   card: {
     width: '100%',

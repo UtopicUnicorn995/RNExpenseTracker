@@ -4,18 +4,21 @@ export const logUsersTable = async db => {
     return;
   }
 
+  console.log('here has db.', db);
+
   db.transaction(tx => {
     tx.executeSql(
       'SELECT * FROM users',
       [],
       (tx, results) => {
+        console.log('📋 Users table:', results.rows);
         const len = results.rows.length;
         if (len > 0) {
           let users = [];
           for (let i = 0; i < len; i++) {
             users.push(results.rows.item(i));
           }
-          console.log('📋 Users table:', users);
+          console.log('📋 Users tables:', users);
         } else {
           console.log('📋 Users table is empty');
         }
@@ -27,7 +30,15 @@ export const logUsersTable = async db => {
   });
 };
 
-export const saveUser = async (db, userId, username, email) => {
+export const saveUser = async (
+  db,
+  userId,
+  username,
+  email,
+  availableBalance,
+  accountNumber,
+  role,
+) => {
   if (!db) {
     console.error('Database is undefined');
     return;
@@ -38,10 +49,10 @@ export const saveUser = async (db, userId, username, email) => {
   try {
     await db.transaction(async tx => {
       tx.executeSql(
-        'INSERT OR REPLACE INTO users (id, username, email) VALUES (?, ?, ?)',
-        [userId, username, email],
+        'INSERT OR REPLACE INTO users (id, username, email, account_number, available_balance, role) VALUES (?, ?, ?, ?, ?, ?)',
+        [userId, username, email, accountNumber, availableBalance, role],
         (tx, results) => {
-          console.log('User saved to SQLite');
+          console.log('User saved to SQLite', results.rows.item(0));
           logUsersTable(db);
         },
         (tx, error) => {

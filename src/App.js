@@ -18,7 +18,6 @@ const options = {
 };
 
 function AuthenticatedStack() {
-  console.log('Authenticated stack');
   return (
     <Stack.Navigator initialRouteName="MainTabs">
       <Stack.Screen name="MainTabs" component={Tabs} options={options} />
@@ -40,13 +39,10 @@ function GuestStack() {
 function RootNavigator() {
   const {user, loading} = useUser();
 
-  console.log('loaddding');
-
   if (loading) {
     return <SplashScreen />
   };
 
-  console.log('Logged in user:', user);
   return (
     <NavigationContainer>
       {user ? <AuthenticatedStack /> : <GuestStack />}
@@ -61,9 +57,7 @@ const App = () => {
     const prepareApp = async () => {
       try {
         const db = await initDB();
-        console.log('Database object:', db);
         const user = await getUser(db);
-        console.log('DB initialized!', user);
       } catch (error) {
         console.error('Error during app init:', error);
       } finally {
@@ -75,7 +69,6 @@ const App = () => {
   }, []);
 
   if (!isReady) {
-    console.log('not ready pa');
     return null;
   }
 

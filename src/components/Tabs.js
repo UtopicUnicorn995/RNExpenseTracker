@@ -100,6 +100,10 @@ export default function Tabs() {
           header: () => (
             <CustomHeader
               title="Home"
+              searchBar={{
+                placeholder: 'Search',
+                onChangeText: text => console.log(text),
+              }}
               buttons={[
                 {icon: 'add', onPress: () => console.log('Add clicked')},
               ]}
