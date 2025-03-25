@@ -28,7 +28,7 @@ export default function CustomHeader({title, buttons = [], searchBar}) {
       {title && (
         <Text style={{fontSize: hp('2.5%'), fontWeight: 'bold'}}>{title}</Text>
       )}
-      {searchBar && (
+      {/* {searchBar && (
         <View style={{flex: 1, marginHorizontal: hp('2%')}}>
           <TextInput
             style={{
@@ -41,7 +41,7 @@ export default function CustomHeader({title, buttons = [], searchBar}) {
             onChangeText={searchBar.onChangeText}
           />
         </View>
-      )}
+      )} */}
 
       {/* Right: Dynamic Buttons */}
       {/* <View style={{flexDirection: 'row'}}>

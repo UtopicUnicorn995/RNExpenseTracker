@@ -25,7 +25,7 @@ export const initExpenseDB = async () => {
 
       // Optional: Expense history table
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS expense_history (
+        `CREATE TABLE IF NOT EXISTS transactions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           expense_id INTEGER,
           user_id INTEGER,

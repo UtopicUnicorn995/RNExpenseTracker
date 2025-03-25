@@ -1,5 +1,10 @@
 import {createContext, useState, useEffect, useContext} from 'react';
-import {getUser, saveUser} from './database/userQueries';
+import {
+  getUser,
+  saveUser,
+  saveTransaction,
+  getTransactions,
+} from './database/userQueries';
 import axios from 'axios';
 import {useApp} from './AppContext';
 import {jwtDecode} from 'jwt-decode';
@@ -9,12 +14,10 @@ const UserContext = createContext();
 export const UserProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [transactions, setTransactions] = useState([]);
   const {apiUrl, db} = useApp();
-
-  console.log('user', user);
-
+  
   const setUserData = userData => {
-    console.log('setting user data', userData);
     setUser(userData);
   };
 
@@ -27,9 +30,12 @@ export const UserProvider = ({children}) => {
       }
       try {
         const hasUser = await getUser(db);
+        let userTransactions;
 
         if (hasUser) {
           setUserData(hasUser);
+          userTransactions = await getTransactions(db, hasUser.id, apiUrl);
+          setTransactions(userTransactions);
         }
       } catch (error) {
         console.error('Failed to fetch user from local DB:', error);
@@ -39,7 +45,7 @@ export const UserProvider = ({children}) => {
     };
 
     checkLocalUser();
-  }, [db]);
+  }, [db,]);
 
   if (loading) {
     return null;
@@ -72,15 +78,21 @@ export const UserProvider = ({children}) => {
       const res = await axios.post(`${apiUrl}/users/login`, payload);
 
       if (res.status === 200) {
-        const {userId, username, email, availableBalance, accountNumber, role} =
-          decodeUser(res.data.token);
+        const {
+          userId,
+          username,
+          email,
+          available_balance,
+          account_number,
+          role,
+        } = decodeUser(res.data.token);
         await saveUser(
           db,
           userId,
           username,
           email,
-          availableBalance,
-          accountNumber,
+          available_balance,
+          account_number,
           role,
         );
         console.log('decoded user:', decodeUser(res.data.token));
@@ -94,7 +106,8 @@ export const UserProvider = ({children}) => {
   };
 
   return (
-    <UserContext.Provider value={{user, loading, setUserData, loginUser}}>
+    <UserContext.Provider
+      value={{user, loading, setUserData, transactions, loginUser}}>
       {children}
     </UserContext.Provider>
   );

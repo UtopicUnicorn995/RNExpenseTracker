@@ -6,68 +6,38 @@ import Card from '../../components/Card';
 import Colors from '../../utility/Colors';
 import {useUser} from '../../UserContext';
 import SplashScreen from '../guests/SplashScreen';
+import Transactions from '../../components/Transactions';
 
 export default Home = () => {
-  const {user} = useUser();
+  const {user, transactions} = useUser();
+  // const {db} = useApp();
 
-  console.log('user dat', user);
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     if (user) {
+  //       console.log('user dat', user);
+
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, [user, db]);
 
   if (!user) {
     return <SplashScreen />;
   }
 
+  // console.log('bastaa db', getTransactions(db, user.id));
+
   return (
     <MainContainer>
-      {/* <Card
-        user={user}
-      /> */}
+      <Card user={user} />
       <View style={styles.activityContainer}>
         <Text style={styles.textBody}>Recent activity</Text>
         <Text style={styles.textBody}>View all</Text>
       </View>
       <MainContainer hasScrollView showsVerticalScrollIndicator={false}>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
-        <Text>
-          Hello world from the main container! Lorem ipsum dolor sit amet
-          consectetur, adipisicing elit. Tenetur reiciendis delectus, vitae
-          molestias provident hic, voluptate commodi doloribus quo nulla amet.
-          Perferendis rerum quidem quas magni dicta. Ut, quia repudiandae.
-        </Text>
+        <Transactions />
       </MainContainer>
     </MainContainer>
   );

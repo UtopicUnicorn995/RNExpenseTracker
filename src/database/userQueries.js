@@ -1,3 +1,6 @@
+import NetInfo from '@react-native-community/netinfo';
+import axios from 'axios';
+
 export const logUsersTable = async db => {
   if (!db) {
     console.error('Database is undefined');
@@ -44,7 +47,15 @@ export const saveUser = async (
     return;
   }
 
-  console.log('here has db.', db);
+  console.log(
+    'here has db. while sabing',
+    userId,
+    username,
+    email,
+    availableBalance,
+    accountNumber,
+    role,
+  );
 
   try {
     await db.transaction(async tx => {
@@ -130,6 +141,139 @@ export const clearUser = async db => {
           logUsersTable(db);
         },
       );
+    });
+  } catch (error) {
+    console.error('Transaction error:', error);
+  }
+};
+
+// export const saveTransaction = async (
+//   db,
+//   userId,
+//   action,
+//   amount,
+//   category,
+//   description,
+//   date,
+// ) => {
+//   if (!db) {
+//     console.error('Database is undefined');
+//     return;
+//   }
+
+//   console.log('saving the transactions');
+
+//   try {
+//     await db.transaction(async tx => {
+//       tx.executeSql(
+//         'INSERT INTO transactions (user_id, action, amount, category, description, date) VALUES (?, ?, ?, ?, ?, ?)',
+//         [userId, action, amount, category, description, date],
+//         (tx, results) => {
+//           console.log('Transaction saved to SQLite', results.rows.item(0));
+//           logUsersTable(db);
+//         },
+//         (tx, error) => {
+//           console.error('Save transaction error:', error);
+//           logUsersTable(db);
+//         },
+//       );
+//     });
+//   } catch (error) {}
+// };
+
+export const getTransactions = async (db, userId, apiUrl) => {
+  console.log('starting.', db, userId);
+  if (!db || typeof db.transaction !== 'function') {
+    console.error(
+      'Database is undefined or not properly initialized',
+      db,
+      db.transaction,
+    );
+    return null;
+  }
+
+  try {
+    const state = await NetInfo.fetch();
+    if (state.isConnected) {
+      try {
+        const response = await axios.get(`${apiUrl}/users/get-transactions`, {
+          params: {user_id: userId},
+        });
+        console.log('Got transactions from API:', response.data);
+        await saveTransactionsToLocalDB(db, response.data);
+
+        let transactions = [];
+
+        if (response.data.result.length > 0) {
+          for (let i = 0; i < response.data.result.length; i++) {
+            transactions.push(response.data.result[i]);
+          }
+        }
+
+        return transactions;
+      } catch (apiError) {
+        console.error('API error:', apiError);
+      }
+    }
+
+    // Fetch transactions from local database
+    const result = await new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM transactions WHERE user_id = ?',
+          [userId],
+          (tx, results) => {
+            console.log('Got transactions from local DB:', results.rows);
+            if (results.rows.length > 0) {
+              let transactions = [];
+              for (let i = 0; i < results.rows.length; i++) {
+                transactions.push(results.rows.item(i));
+              }
+              console.log('Got transactions from local DB:', transactions);
+              resolve(transactions);
+            } else {
+              console.log('No transactions found');
+              resolve([]);
+            }
+          },
+          (tx, error) => {
+            console.error('Get transactions error:', error);
+            reject(error);
+          },
+        );
+      });
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Transaction error:', error);
+    return null;
+  }
+};
+
+const saveTransactionsToLocalDB = async (db, transactions) => {
+  try {
+    await db.transaction(async tx => {
+      transactions.forEach(transaction => {
+        tx.executeSql(
+          'INSERT OR REPLACE INTO transactions (id, user_id, action, amount, category, description, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [
+            transaction.id,
+            transaction.user_id,
+            transaction.action,
+            transaction.amount,
+            transaction.category,
+            transaction.description,
+            transaction.date,
+          ],
+          (tx, results) => {
+            console.log('Transaction saved to local DB:', results.rowsAffected);
+          },
+          (tx, error) => {
+            console.error('Save transaction to local DB error:', error);
+          },
+        );
+      });
     });
   } catch (error) {
     console.error('Transaction error:', error);

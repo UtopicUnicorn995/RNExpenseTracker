@@ -66,6 +66,28 @@ export const createTables = async db => {
           console.error('Failed to create expenses table:', error);
         },
       );
+
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS transactions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          expense_id INTEGER,
+          user_id INTEGER,
+          action TEXT,
+          amount REAL,
+          category TEXT,
+          description TEXT,
+          date TEXT,
+          action_time TEXT DEFAULT (datetime('now'))
+        );`,
+        [],
+        (tx, results) => {
+          console.log('transactions table created successfully!');
+        },
+        (tx, error) => {
+          console.error('Failed to create transactions table:', error);
+        },
+      );
+
     });
   } catch (error) {
     console.error('Transaction error:', error);

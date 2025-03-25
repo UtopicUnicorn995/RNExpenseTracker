@@ -48,10 +48,12 @@ export default function Card({user}) {
         </View>
         <View style={styles.cardNumberContainer}>
           <MaskedNumber number={displayCardNumber} />
-          <Image
-            style={styles.imgStyle}
-            source={require('../assets/Eclispe.png')}
-          />
+          <View style={styles.imgStyleContainer}>
+            <Image
+              style={styles.imgStyle}
+              source={require('../assets/Eclispe.png')}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -128,8 +130,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  imgStyle: {
+  imgStyleContainer:{
     width: hp('6%'),
-    aspectRatio: 3 / 2,
+    height: hp('4%'),
+    overflow: 'hidden'
+  },
+  imgStyle: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });
