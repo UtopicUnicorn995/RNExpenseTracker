@@ -36,8 +36,8 @@ export default Home = () => {
         <Text style={styles.textBody}>Recent activity</Text>
         <Text style={styles.textBody}>View all</Text>
       </View>
-      <MainContainer hasScrollView showsVerticalScrollIndicator={false}>
-        <Transactions />
+      <MainContainer showsVerticalScrollIndicator={false}>
+        <Transactions transactions={transactions} />
       </MainContainer>
     </MainContainer>
   );
