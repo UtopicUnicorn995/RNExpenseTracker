@@ -10,13 +10,26 @@ import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 export default function Profile() {
   const {db} = useApp();
-  const {setUserData, user} = useUser();
+  const {setUserData, setTransactions,  refreshData} = useUser();
 
-  console.log('user account', user);
+  const clearUserData = async () => {
+    if (!db) {
+      console.error('Database is not initialized');
+      return;
+    }
+    try {
+      await clearUser(db);
+
+      setUserData(null);
+      setTransactions([]);
+    } catch (error) {
+      console.error('Error clearing user data:', error);
+    }
+  };
 
   const logout = async () => {
-    await clearUser(db);
-    setUserData(null);
+    await clearUserData(db);
+    console.log('User logged out and data cleared');
   };
 
   return (

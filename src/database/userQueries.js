@@ -141,6 +141,20 @@ export const clearUser = async db => {
           logUsersTable(db);
         },
       );
+
+      tx.executeSql(
+        'DELETE FROM transactions',
+        [],
+        (tx, results) => {
+          console.log(
+            'Transactions cleared from SQLite:',
+            results.rowsAffected,
+          );
+        },
+        (tx, error) => {
+          console.error('Clear transactions error:', error);
+        },
+      );
     });
   } catch (error) {
     console.error('Transaction error:', error);

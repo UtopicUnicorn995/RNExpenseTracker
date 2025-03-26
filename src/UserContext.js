@@ -15,13 +15,19 @@ export const UserProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const {apiUrl, db} = useApp();
-  
+
   const setUserData = userData => {
     setUser(userData);
   };
 
+  const refreshData = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  };
+
   useEffect(() => {
+    console.log('use effect is running');
     const checkLocalUser = async () => {
       if (!db) {
         console.error('Database is not initialized');
@@ -32,10 +38,15 @@ export const UserProvider = ({children}) => {
         const hasUser = await getUser(db);
         let userTransactions;
 
+        console.log('transaction1', hasUser.id);
+
         if (hasUser) {
           setUserData(hasUser);
           userTransactions = await getTransactions(db, hasUser.id, apiUrl);
           setTransactions(userTransactions);
+        } else {
+          setUserData(null);
+          setTransactions([]);
         }
       } catch (error) {
         console.error('Failed to fetch user from local DB:', error);
@@ -45,7 +56,7 @@ export const UserProvider = ({children}) => {
     };
 
     checkLocalUser();
-  }, [db,]);
+  }, [db, refreshKey]);
 
   if (loading) {
     return null;
@@ -97,6 +108,7 @@ export const UserProvider = ({children}) => {
         );
         console.log('decoded user:', decodeUser(res.data.token));
         setUserData(decodeUser(res.data.token));
+        refreshData();
       } else {
         console.log('Login failed, check credentials');
       }
@@ -107,7 +119,15 @@ export const UserProvider = ({children}) => {
 
   return (
     <UserContext.Provider
-      value={{user, loading, setUserData, transactions, loginUser}}>
+      value={{
+        user,
+        loading,
+        setUserData,
+        transactions,
+        setTransactions,
+        loginUser,
+        refreshData,
+      }}>
       {children}
     </UserContext.Provider>
   );

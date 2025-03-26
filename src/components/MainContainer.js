@@ -29,6 +29,5 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: hp('3%'),
     paddingHorizontal: wp('5%'),
-    paddingBottom: hp('3%'),
   },
 });

@@ -3,6 +3,7 @@ import {useRef} from 'react';
 import {useLinkBuilder, useTheme} from '@react-navigation/native';
 import {PlatformPressable} from '@react-navigation/elements';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import IOIcon from 'react-native-vector-icons/Ionicons';
 import Calendar from '../screens/users/Calendar';
 import Home from '../screens/users/Home';
@@ -10,6 +11,7 @@ import Graph from '../screens/users/Graph';
 import Profile from '../screens/users/Profile';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import CustomHeader from './CustomHeader';
+import TransactionScreen from '../screens/users/TransactionScreen';
 
 function MyTabBar({state, descriptors, navigation}) {
   const {colors} = useTheme();
@@ -91,25 +93,56 @@ function MyTabBar({state, descriptors, navigation}) {
 
 export default function Tabs() {
   const Tab = createBottomTabNavigator();
+  const Stack = createNativeStackNavigator();
+
+  const HomeNavigator = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{
+            header: () => (
+              <CustomHeader
+                title="Home"
+                searchBar={{
+                  placeholder: 'Search',
+                  onChangeText: text => console.log(text),
+                }}
+                buttons={[
+                  {icon: 'add', onPress: () => console.log('Add clicked')},
+                ]}
+              />
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="TransactionScreen"
+          component={TransactionScreen}
+          options={{
+            header: () => (
+              <CustomHeader
+                title="Transaction Details"
+                buttons={[
+                  {
+                    icon: 'close',
+                    onPress: () => console.log('Close clicked'),
+                  },
+                ]}
+              />
+            ),
+          }}
+        />
+      </Stack.Navigator>
+    );
+  };
+
   return (
     <Tab.Navigator tabBar={props => <MyTabBar {...props} />}>
       <Tab.Screen
         name="Home"
-        component={Home}
-        options={{
-          header: () => (
-            <CustomHeader
-              title="Home"
-              searchBar={{
-                placeholder: 'Search',
-                onChangeText: text => console.log(text),
-              }}
-              buttons={[
-                {icon: 'add', onPress: () => console.log('Add clicked')},
-              ]}
-            />
-          ),
-        }}
+        component={HomeNavigator}
+        options={{headerShown: false}}
       />
       <Tab.Screen
         name="Calendar"
@@ -155,3 +188,5 @@ export default function Tabs() {
     </Tab.Navigator>
   );
 }
+
+const HomeNavigator = () => {};
