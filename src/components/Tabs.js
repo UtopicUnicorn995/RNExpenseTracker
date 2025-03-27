@@ -1,23 +1,21 @@
-import {View, Pressable, Animated} from 'react-native';
-import {useRef} from 'react';
-import {useLinkBuilder, useTheme} from '@react-navigation/native';
-import {PlatformPressable} from '@react-navigation/elements';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { View, Pressable, Animated } from 'react-native';
+import { useRef } from 'react';
+import { useLinkBuilder, useTheme } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import IOIcon from 'react-native-vector-icons/Ionicons';
 import Calendar from '../screens/users/Calendar';
 import Home from '../screens/users/Home';
 import Graph from '../screens/users/Graph';
 import Profile from '../screens/users/Profile';
-import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import CustomHeader from './CustomHeader';
 import TransactionScreen from '../screens/users/TransactionScreen';
+import CustomHeader from './CustomHeader';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-function MyTabBar({state, descriptors, navigation}) {
-  const {colors} = useTheme();
-  const {buildHref} = useLinkBuilder();
+function MyTabBar({ state, descriptors, navigation }) {
+  const { colors } = useTheme();
+  const { buildHref } = useLinkBuilder();
 
-  // Create an array of animated values for each tab
   const scaleAnims = useRef(
     state.routes.map(() => new Animated.Value(1)),
   ).current;
@@ -46,7 +44,7 @@ function MyTabBar({state, descriptors, navigation}) {
         paddingBottom: hp('1%'),
       }}>
       {state.routes.map((route, index) => {
-        const {options} = descriptors[route.key];
+        const { options } = descriptors[route.key];
         const isFocused = state.index === index;
 
         const iconNames = {
@@ -74,11 +72,11 @@ function MyTabBar({state, descriptors, navigation}) {
             onPressIn={() => onPressIn(index)}
             onPressOut={() => onPressOut(index)}
             href={buildHref(route.name, route.params)}
-            accessibilityState={isFocused ? {selected: true} : {}}
+            accessibilityState={isFocused ? { selected: true } : {}}
             onPress={onPress}>
-            <Animated.View style={{transform: [{scale: scaleAnims[index]}]}}>
+            <Animated.View style={{ transform: [{ scale: scaleAnims[index] }] }}>
               <IOIcon
-                style={{textAlign: 'center', padding: hp('2%')}}
+                style={{ textAlign: 'center', padding: hp('2%') }}
                 color={isFocused ? 'black' : 'gray'}
                 name={iconNames[route.name]}
                 size={hp('4%')}
@@ -95,10 +93,10 @@ export default function Tabs() {
   const Tab = createBottomTabNavigator();
   const Stack = createNativeStackNavigator();
 
-  const HomeNavigator = () => {
+  const TabNavigator = () => {
     return (
-      <Stack.Navigator>
-        <Stack.Screen
+      <Tab.Navigator tabBar={props => <MyTabBar {...props} />}>
+        <Tab.Screen
           name="Home"
           component={Home}
           options={{
@@ -110,83 +108,98 @@ export default function Tabs() {
                   onChangeText: text => console.log(text),
                 }}
                 buttons={[
-                  {icon: 'add', onPress: () => console.log('Add clicked')},
+                  { icon: 'add', onPress: () => console.log('Add clicked') },
                 ]}
               />
             ),
           }}
         />
-        <Stack.Screen
-          name="TransactionScreen"
-          component={TransactionScreen}
+        <Tab.Screen
+          name="Calendar"
+          component={Calendar}
           options={{
             header: () => (
               <CustomHeader
-                title="Transaction Details"
+                title="Calendar"
                 buttons={[
                   {
-                    icon: 'close',
-                    onPress: () => console.log('Close clicked'),
+                    icon: 'calendar',
+                    onPress: () => console.log('Calendar clicked'),
                   },
                 ]}
               />
             ),
           }}
         />
-      </Stack.Navigator>
+        <Tab.Screen
+          name="Graph"
+          component={Graph}
+          options={{
+            header: () => <CustomHeader title="Graph" />,
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            header: () => (
+              <CustomHeader
+                buttons={[
+                  {
+                    icon: 'settings',
+                    onPress: () => console.log('Settings clicked'),
+                  },
+                ]}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     );
   };
 
+  // Main Stack Navigator
   return (
-    <Tab.Navigator tabBar={props => <MyTabBar {...props} />}>
-      <Tab.Screen
-        name="Home"
-        component={HomeNavigator}
-        options={{headerShown: false}}
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Tabs"
+        component={TabNavigator}
+        options={{ headerShown: false }}
       />
-      <Tab.Screen
-        name="Calendar"
-        component={Calendar}
+      <Stack.Screen
+        name="TransactionScreen"
+        component={TransactionScreen}
         options={{
           header: () => (
             <CustomHeader
-              title="Calendar"
+              title="Transaction Details"
               buttons={[
                 {
-                  icon: 'calendar',
-                  onPress: () => console.log('Calendar clicked'),
+                  icon: 'arrow-back',
+                  onPress: () => console.log('Close clicked'),
                 },
               ]}
             />
           ),
         }}
       />
-      <Tab.Screen
-        name="Graph"
-        component={Graph}
-        options={{
-          header: () => <CustomHeader title="Graph" />,
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
+      <Stack.Screen
+        name="SettingsScreen"
+        component={TransactionScreen}
         options={{
           header: () => (
             <CustomHeader
-              // title="Profile"
+              title="Transaction Details"
               buttons={[
                 {
-                  icon: 'settings',
-                  onPress: () => console.log('Settings clicked'),
+                  icon: 'close',
+                  onPress: () => console.log('Close clicked'),
                 },
               ]}
             />
           ),
         }}
       />
-    </Tab.Navigator>
+    </Stack.Navigator>
   );
 }
-
-const HomeNavigator = () => {};

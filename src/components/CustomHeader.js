@@ -7,27 +7,32 @@ import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 export default function CustomHeader({title, buttons = [], searchBar}) {
   const navigation = useNavigation();
 
+  const canGoBack = () => navigation.canGoBack();
+  const hasBackButton = buttons.find(item => item.icon === 'arrow-back');
+
+  console.log('can go back', canGoBack());
+
   return (
     <View
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         padding: hp('2%'),
         paddingTop: hp('4%'),
       }}>
-      {/* {navigation.canGoBack() ? (
+      {navigation.canGoBack() && hasBackButton ? (
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <IOIcon name="arrow-back" size={hp('3%')} color="black" />
         </TouchableOpacity>
       ) : (
         <View style={{width: hp('3%')}} />
-      )} */}
+      )}
 
       {/* Center: Title */}
-      {title && (
+      {/* {title && !navigation.canGoBack() && (
         <Text style={{fontSize: hp('2.5%'), fontWeight: 'bold'}}>{title}</Text>
-      )}
+      )} */}
       {/* {searchBar && (
         <View style={{flex: 1, marginHorizontal: hp('2%')}}>
           <TextInput

@@ -20,13 +20,14 @@ export default function Button({
   loading = false,
   disabled = false,
   iconOnly = false,
+  textOnly = false,
   style = {},
   textStyle = {},
   imageSource,
 }) {
   const theme = useColorScheme();
 
-  console.log('thene', theme)
+  console.log('thene', theme);
 
   return (
     <Pressable
@@ -38,6 +39,7 @@ export default function Button({
           (theme === 'dark' ? styles.darkButton : styles.lightButton),
         pressed && !iconOnly && styles.pressed,
         disabled && !iconOnly && styles.disabled,
+        textOnly && styles.textOnlyContainer,
         style,
       ]}>
       {loading ? (
@@ -56,7 +58,12 @@ export default function Button({
           {imageSource && (
             <Image style={styles.imageIcon} source={imageSource} />
           )}
-          {!iconOnly && <Text style={[styles.text, textStyle]}>{title}</Text>}
+          {!iconOnly && (
+            <Text
+              style={[styles.text, textStyle, textOnly && styles.textOnlyText]}>
+              {title}
+            </Text>
+          )}
         </View>
       )}
     </Pressable>
@@ -112,5 +119,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: hp('1%'),
+  },
+  textOnlyContainer: {
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+  },
+  textOnlyText: {
+    fontSize: hp('2.25%'),
+    fontWeight: 'bold',
+    color: Colors.primaryTextColor,
   },
 });

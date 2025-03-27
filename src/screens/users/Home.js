@@ -31,7 +31,7 @@ export default Home = () => {
         </Pressable>
       </View>
       <MainContainer showsVerticalScrollIndicator={false}>
-        <Transactions transactions={transactions} />
+        <Transactions transactions={transactions} limit={3}/>
       </MainContainer>
     </MainContainer>
   );

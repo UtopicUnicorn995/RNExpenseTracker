@@ -1,27 +1,28 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import MainContainer from '../../components/MainContainer';
+import Transactions from '../../components/Transactions';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import Colors from '../../utility/Colors';
 
-export default function TransactionScreen() {
+export default function TransactionScreen({route}) {
+  const transactions = route.params.transactions;
+  console.log('routee', route.params);
   return (
-    <MainContainer hasScrollView>
+    <MainContainer>
       <View style={styles.container}>
-        <Text style={styles.title}>Transaction History</Text>
-        {/* <FlatList
-          data={transactionData}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({item}) => (
-            <TransactionCard
-              transaction={item}
-              onPress={() =>
-                navigation.navigate('TransactionDetails', {transaction: item})
-              }
-            />
-          )}
-        /> */}
+        <Text style={styles.title}>Transactions History</Text>
+        <Transactions transactions={transactions} />
       </View>
     </MainContainer>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  title: {
+    fontSize: hp('3%'),
+    fontWeight: 'bold',
+    color: Colors.primaryTextColor,
+    marginBottom: hp('2%'),
+  },
+});

@@ -7,10 +7,12 @@ import {useUser} from '../../UserContext';
 import MAIcons from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../../utility/Colors';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Profile() {
   const {db} = useApp();
-  const {setUserData, setTransactions,  refreshData} = useUser();
+  const {setUserData, setTransactions, refreshData} = useUser();
+  const navigation = useNavigation();
 
   const clearUserData = async () => {
     if (!db) {

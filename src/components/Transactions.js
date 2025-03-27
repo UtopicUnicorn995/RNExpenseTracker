@@ -1,11 +1,25 @@
 import Colors from '../utility/Colors';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {useState} from 'react';
+import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import Button from './Button';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {convertToPeso} from '../utility/utils';
 
-export default Transactions = ({transactions}) => {
+export default Transactions = ({transactions, limit, onViewMore}) => {
+  const [filteredTransactions, setFilteredTransactions] = useState(
+    limit && transactions.length > limit
+      ? [...transactions.slice(0, limit), {type: 'button'}]
+      : transactions,
+  );
+
+  console.log('transactions fil', filteredTransactions);
+
+  const handleShowMore = () => {
+    setFilteredTransactions(transactions);
+  };
+
   const TransactionItem = ({transaction}) => {
-    console.log('transaction', transaction);
+    console.log('Rendering transaction item:', transaction);
 
     const months = [
       'Jan',
@@ -22,9 +36,7 @@ export default Transactions = ({transactions}) => {
       'Dec',
     ];
 
-    // const date = new Date(transaction.action_time).toLocaleString();
     const date = new Date(transaction.action_time);
-
     const getDateString = `${date.getDate()} ${
       months[date.getMonth()]
     }, ${date.getFullYear()}`;
@@ -42,8 +54,6 @@ export default Transactions = ({transactions}) => {
     const amountStyleName =
       categoryStyles[transaction.category] || categoryStyles.default;
 
-    console.log('amoyunt Style name', amountStyleName, transaction.category);
-
     return (
       <View style={styles.transactionItem}>
         <View style={styles.transactionItemLeft}>
@@ -53,6 +63,7 @@ export default Transactions = ({transactions}) => {
               : 'No description'}
           </Text>
           <Text style={styles.transactionCategoryText}>
+            {console.log('category', transaction.category)}
             {transaction.category}
           </Text>
         </View>
@@ -66,12 +77,23 @@ export default Transactions = ({transactions}) => {
     );
   };
 
+  const renderItem = ({item}) => {
+    console.log('redered item', item);
+    if (item.type === 'button') {
+      return <Button textOnly onPress={handleShowMore} title={'View more'} />;
+    }
+
+    return <TransactionItem transaction={item} />;
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={transactions}
-        renderItem={({item}) => <TransactionItem transaction={item} />}
-        keyExtractor={item => item.id.toString()}
+        data={filteredTransactions}
+        renderItem={renderItem}
+        keyExtractor={(item, index) =>
+          item.type === 'button' ? `button-${index}` : item.id.toString()
+        }
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -99,7 +121,7 @@ const styles = StyleSheet.create({
   transactionItemRight: {
     alignItems: 'flex-end',
   },
-  neutralStyle:{
+  neutralStyle: {
     color: Colors.primaryTextColor,
   },
   depositStyle: {
@@ -107,5 +129,17 @@ const styles = StyleSheet.create({
   },
   withdrawStyle: {
     color: Colors.red,
+  },
+  viewMoreButton: {
+    marginTop: hp('2%'),
+    alignItems: 'center',
+    padding: hp('1.5%'),
+    backgroundColor: Colors.primaryButtonColor,
+    borderRadius: hp('1%'),
+  },
+  viewMoreText: {
+    color: Colors.white,
+    fontSize: hp('2%'),
+    fontWeight: 'bold',
   },
 });
