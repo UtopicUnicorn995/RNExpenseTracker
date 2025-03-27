@@ -1,5 +1,11 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
 import MainContainer from '../../components/MainContainer';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Card from '../../components/Card';
@@ -12,6 +18,17 @@ import {useNavigation} from '@react-navigation/native';
 export default Home = () => {
   const {user, transactions} = useUser();
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [transactions]);
+
+  console.log('Transactions from the home screen:', transactions);
 
   if (!user) {
     return <SplashScreen />;
@@ -31,7 +48,13 @@ export default Home = () => {
         </Pressable>
       </View>
       <MainContainer showsVerticalScrollIndicator={false}>
-        <Transactions transactions={transactions} limit={3}/>
+        {isLoading ? (
+          <ActivityIndicator size="large" color={Colors.primaryTextColor} />
+        ) : transactions && transactions.length > 0 ? (
+          <Transactions transactions={transactions} limit={20} />
+        ) : (
+          <Text style={styles.noTransactionsText}>No recent activity</Text>
+        )}
       </MainContainer>
     </MainContainer>
   );
@@ -49,5 +72,11 @@ const styles = StyleSheet.create({
     color: Colors.primaryTextColor,
     fontSize: hp('2.25%'),
     fontWeight: 'bold',
+  },
+  noTransactionsText: {
+    textAlign: 'center',
+    color: Colors.primaryTextColor,
+    fontSize: hp('2%'),
+    marginTop: hp('2%'),
   },
 });

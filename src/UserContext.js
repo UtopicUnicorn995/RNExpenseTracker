@@ -18,6 +18,8 @@ export const UserProvider = ({children}) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const {apiUrl, db} = useApp();
 
+  console.log('transaction from userContext', transactions)
+
   const setUserData = userData => {
     setUser(userData);
   };
