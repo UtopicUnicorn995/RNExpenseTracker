@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {useRef, useEffect} from 'react';
+import {useRef, useEffect, useState} from 'react';
 import {useLinkBuilder, useTheme} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -14,13 +14,19 @@ import Calendar from '../screens/users/Calendar';
 import Home from '../screens/users/Home';
 import Graph from '../screens/users/Graph';
 import Profile from '../screens/users/Profile';
+import ModalContainer from './ModalContainer';
 import TransactionScreen from '../screens/users/TransactionScreen';
 import CustomHeader from './CustomHeader';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {useUser} from '../UserContext';
+import {KeyboardAvoidingView, Platform} from 'react-native';
 
-function MyTabBar({state, descriptors, navigation}) {
-  const {colors} = useTheme();
+function MyTabBar({state, descriptors, navigation, setModalVisible}) {
   const {buildHref} = useLinkBuilder();
+
+  const {user} = useUser();
+
+  console.log('user from the Tabs component', user);
 
   const scaleAnims = useRef(
     state.routes.map(() => new Animated.Value(1)),
@@ -84,6 +90,11 @@ function MyTabBar({state, descriptors, navigation}) {
         };
 
         const onPress = () => {
+          if (route.name == 'AddExpense') {
+            setModalVisible(prevState => !prevState);
+            console.log('return nothing hehe');
+            return;
+          }
           const event = navigation.emit({
             type: 'tabPress',
             target: route.key,
@@ -148,129 +159,139 @@ export default function Tabs() {
   const Tab = createBottomTabNavigator();
   const Stack = createNativeStackNavigator();
 
+  const [modalVisible, setModalVisible] = useState(false);
+
   const TabNavigator = () => {
     return (
-      <Tab.Navigator tabBar={props => <MyTabBar {...props} />}>
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            header: () => (
-              <CustomHeader
-                title="Home"
-                searchBar={{
-                  placeholder: 'Search',
-                  onChangeText: text => console.log(text),
-                }}
-                buttons={[
-                  {icon: 'add', onPress: () => console.log('Add clicked')},
-                ]}
-              />
-            ),
-          }}
+      <>
+        <ModalContainer
+          modalVisible={modalVisible}
+          handleSetModalVisible={setModalVisible}
         />
-        <Tab.Screen
-          name="Calendar"
-          component={Calendar}
-          options={{
-            header: () => (
-              <CustomHeader
-                title="Calendar"
-                buttons={[
-                  {
-                    icon: 'calendar',
-                    onPress: () => console.log('Calendar clicked'),
-                  },
-                ]}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="AddExpense"
-          component={() => null}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <View style={styles.addButton}>
-                <IOIcon name="add" size={hp('4%')} color="white" />
-              </View>
-            ),
-            tabBarButton: props => (
-              <TouchableOpacity
-                {...props}
-                onPress={() => console.log('Add Expense clicked')}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Graph"
-          component={Graph}
-          options={{
-            header: () => <CustomHeader title="Graph" />,
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={Profile}
-          options={{
-            header: () => (
-              <CustomHeader
-                buttons={[
-                  {
-                    icon: 'settings',
-                    onPress: () => console.log('Settings clicked'),
-                  },
-                ]}
-              />
-            ),
-          }}
-        />
-      </Tab.Navigator>
+        <Tab.Navigator screenOptions={{ keyboardHidesTabBar: true }}
+          tabBar={props => (
+            <MyTabBar {...props} setModalVisible={setModalVisible} />
+          )}>
+          <Tab.Screen
+            name="Home"
+            component={Home}
+            options={{
+              header: () => (
+                <CustomHeader
+                  title="Home"
+                  searchBar={{
+                    placeholder: 'Search',
+                    onChangeText: text => console.log(text),
+                  }}
+                  buttons={[
+                    {icon: 'add', onPress: () => console.log('Add clicked')},
+                  ]}
+                />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Calendar"
+            component={Calendar}
+            options={{
+              header: () => (
+                <CustomHeader
+                  title="Calendar"
+                  buttons={[
+                    {
+                      icon: 'calendar',
+                      onPress: () => console.log('Calendar clicked'),
+                    },
+                  ]}
+                />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="AddExpense"
+            component={() => null}
+            // options={{
+            //   tabBarButton: props => (
+            //     <TouchableOpacity
+            //       {...props}
+            //       onPress={() => console.log('Add Expense clicked')}
+            //     />
+            //   ),
+            // }}
+          />
+          <Tab.Screen
+            name="Graph"
+            component={Graph}
+            options={{
+              header: () => <CustomHeader title="Graph" />,
+            }}
+          />
+          <Tab.Screen
+            name="Profile"
+            component={Profile}
+            options={{
+              header: () => (
+                <CustomHeader
+                  buttons={[
+                    {
+                      icon: 'settings',
+                      onPress: () => console.log('Settings clicked'),
+                    },
+                  ]}
+                />
+              ),
+            }}
+          />
+        </Tab.Navigator>
+      </>
     );
   };
 
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Tabs"
-        component={TabNavigator}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="TransactionScreen"
-        component={TransactionScreen}
-        options={{
-          header: () => (
-            <CustomHeader
-              title="Transaction Details"
-              buttons={[
-                {
-                  icon: 'arrow-back',
-                  onPress: () => console.log('Close clicked'),
-                },
-              ]}
-            />
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="SettingsScreen"
-        component={TransactionScreen}
-        options={{
-          header: () => (
-            <CustomHeader
-              title="Transaction Details"
-              buttons={[
-                {
-                  icon: 'close',
-                  onPress: () => console.log('Close clicked'),
-                },
-              ]}
-            />
-          ),
-        }}
-      />
-    </Stack.Navigator>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{flex: 1}}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Tabs"
+          component={TabNavigator}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="TransactionScreen"
+          component={TransactionScreen}
+          options={{
+            header: () => (
+              <CustomHeader
+                title="Transaction Details"
+                buttons={[
+                  {
+                    icon: 'arrow-back',
+                    onPress: () => console.log('Close clicked'),
+                  },
+                ]}
+              />
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="SettingsScreen"
+          component={TransactionScreen}
+          options={{
+            header: () => (
+              <CustomHeader
+                title="Transaction Details"
+                buttons={[
+                  {
+                    icon: 'close',
+                    onPress: () => console.log('Close clicked'),
+                  },
+                ]}
+              />
+            ),
+          }}
+        />
+      </Stack.Navigator>
+    </KeyboardAvoidingView>
   );
 }
