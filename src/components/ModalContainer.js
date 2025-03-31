@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {
   View,
   Modal,
@@ -5,7 +6,6 @@ import {
   TextInput,
   StyleSheet,
   TouchableWithoutFeedback,
-  Keyboard,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
@@ -13,11 +13,53 @@ import {
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Button from './Button';
 import Colors from '../utility/Colors';
+import FAIcon from 'react-native-vector-icons/FontAwesome';
+
+const icons = [
+  {
+    name: 'shopping-cart',
+    activeColor: '#FF6A00',
+    size: hp('3.5%'),
+  },
+  {
+    name: 'laptop',
+    activeColor: '#7A2B1B',
+    size: hp('3.5%'),
+  },
+  {
+    name: 'glass',
+    activeColor: '#4CAF50',
+    size: hp('3.5%'),
+  },
+  {
+    name: 'heartbeat',
+    activeColor: '#E91E63',
+    size: hp('3.5%'),
+  },
+  {
+    name: 'credit-card',
+    activeColor: '#001BB1',
+    size: hp('3.5%'),
+  },
+  {
+    name: 'graduation-cap',
+    activeColor: '#2196F3',
+    size: hp('3.5%'),
+  },
+];
 
 const screenWidth = Dimensions.get('window').width;
 const modalWidth = screenWidth - 40;
 
 export default function ModalContainer({modalVisible, handleSetModalVisible}) {
+  const [selectedCategory, setSelectedCategory] = useState('');
+
+  const handleSelectCategory = categoryName => {
+    setSelectedCategory(categoryName);
+  };
+
+  console.log('selected category', selectedCategory);
+
   return (
     <Modal
       animationType="slide"
@@ -34,10 +76,27 @@ export default function ModalContainer({modalVisible, handleSetModalVisible}) {
               keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
               style={styles.keyboardView}>
               <View style={styles.modalContent}>
+                <View>
+                  <Text>I'll add the texes here tomorrow</Text>
+                </View>
                 <View style={styles.inputContainer}>
                   <Text style={styles.title}>Category</Text>
-                  <View>
-                    <Text>Basta stuff</Text>
+                  <View style={styles.categoryIconsContainer}>
+                    {icons.map((icon, index) => {
+                      return (
+                        <FAIcon
+                          key={index}
+                          name={icon.name}
+                          size={icon.size}
+                          color={
+                            icon.name == selectedCategory
+                              ? icon.activeColor
+                              : Colors.subTextColor
+                          }
+                          onPress={() => handleSelectCategory(icon.name)}
+                        />
+                      );
+                    })}
                   </View>
                 </View>
                 <View style={styles.inputContainer}>
@@ -100,5 +159,15 @@ const styles = StyleSheet.create({
     borderColor: Colors.subTextColor,
     borderRadius: 5,
     padding: 10,
+  },
+  categoryIconsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    rowGap: hp('5%'),
+    columnGap: hp('9%'),
+    padding: hp('2%'),
   },
 });
