@@ -52,10 +52,13 @@ export const createTables = async db => {
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS expenses (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          user_id INTEGER,
+          user_id INTEGER NOT NULL,
           amount REAL NOT NULL,
           description TEXT,
+          category TEXT,
+          synced INTEGER DEFAULT 0,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id)
         );`,
         [],
@@ -87,11 +90,8 @@ export const createTables = async db => {
           console.error('Failed to create transactions table:', error);
         },
       );
-
     });
   } catch (error) {
     console.error('Transaction error:', error);
   }
 };
-
-

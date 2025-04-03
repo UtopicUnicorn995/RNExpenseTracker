@@ -78,6 +78,10 @@ export const saveUser = async (
 };
 
 export const getUser = async db => {
+  const state = await NetInfo.fetch();
+
+  // if (state.isConnected) {
+  // } else {
   if (!db || typeof db.transaction !== 'function') {
     console.error(
       'Database is undefined or not properly initialized',
@@ -113,12 +117,13 @@ export const getUser = async db => {
         );
       });
     });
-
+    console.log('returnn', result);
     return result;
   } catch (error) {
     console.error('Transaction error:', error);
     return null;
   }
+  // }
 };
 
 export const clearUser = async db => {
@@ -160,6 +165,7 @@ export const clearUser = async db => {
     console.error('Transaction error:', error);
   }
 };
+
 
 // export const saveTransaction = async (
 //   db,
@@ -228,37 +234,35 @@ export const getTransactions = async (db, userId, apiUrl) => {
       } catch (apiError) {
         console.error('API error:', apiError);
       }
-    }
-
-    // Fetch transactions from local database
-    const result = await new Promise((resolve, reject) => {
-      db.transaction(tx => {
-        tx.executeSql(
-          'SELECT * FROM transactions WHERE user_id = ?',
-          [userId],
-          (tx, results) => {
-            console.log('Got transactions from local DB:', results.rows);
-            if (results.rows.length > 0) {
-              let transactions = [];
-              for (let i = 0; i < results.rows.length; i++) {
-                transactions.push(results.rows.item(i));
+    } else {
+      const result = await new Promise((resolve, reject) => {
+        db.transaction(tx => {
+          tx.executeSql(
+            'SELECT * FROM transactions WHERE user_id = ?',
+            [userId],
+            (tx, results) => {
+              console.log('Got transactions from local DB:', results.rows);
+              if (results.rows.length > 0) {
+                let transactions = [];
+                for (let i = 0; i < results.rows.length; i++) {
+                  transactions.push(results.rows.item(i));
+                }
+                console.log('Got transactions from local DB:', transactions);
+                resolve(transactions);
+              } else {
+                console.log('No transactions found');
+                resolve([]);
               }
-              console.log('Got transactions from local DB:', transactions);
-              resolve(transactions);
-            } else {
-              console.log('No transactions found');
-              resolve([]);
-            }
-          },
-          (tx, error) => {
-            console.error('Get transactions error:', error);
-            reject(error);
-          },
-        );
+            },
+            (tx, error) => {
+              console.error('Get transactions error:', error);
+              reject(error);
+            },
+          );
+        });
+        return result;
       });
-    });
-
-    return result;
+    }
   } catch (error) {
     console.error('Transaction error:', error);
     return null;

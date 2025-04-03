@@ -21,6 +21,7 @@ export const UserProvider = ({children}) => {
   console.log('transaction from userContext', transactions)
 
   const setUserData = userData => {
+    console.log('userData', userData)
     setUser(userData);
   };
 
@@ -40,11 +41,10 @@ export const UserProvider = ({children}) => {
         const hasUser = await getUser(db);
         let userTransactions;
 
-        console.log('transaction1', hasUser.id);
-
         if (hasUser) {
           setUserData(hasUser);
           userTransactions = await getTransactions(db, hasUser.id, apiUrl);
+          console.log('got transactions from the API')
           setTransactions(userTransactions);
         } else {
           setUserData(null);

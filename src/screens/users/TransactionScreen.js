@@ -19,6 +19,10 @@ export default function TransactionScreen({route}) {
 }
 
 const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+    paddingBottom: hp('8%')
+  },
   title: {
     fontSize: hp('3%'),
     fontWeight: 'bold',

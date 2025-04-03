@@ -11,7 +11,7 @@ import {useNavigation} from '@react-navigation/native';
 
 export default function Profile() {
   const {db} = useApp();
-  const {setUserData, setTransactions, refreshData} = useUser();
+  const {setUserData, setTransactions} = useUser();
   const navigation = useNavigation();
 
   const clearUserData = async () => {

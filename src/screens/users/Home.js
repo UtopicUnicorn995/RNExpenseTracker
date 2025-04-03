@@ -22,13 +22,14 @@ export default Home = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
+      console.log('loading... refreshing data', transactions)
       setIsLoading(false);
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [transactions]);
 
-  console.log('Transactions from the home screen:', transactions);
+  console.log('Transactions from the home screen:', transactions, user);
 
   if (!user) {
     return <SplashScreen />;

@@ -9,7 +9,8 @@ import SplashScreen from './screens/guests/SplashScreen';
 import {AppProvider} from './AppContext';
 import {UserProvider, useUser} from './UserContext';
 import {initDB} from './database/databaseSetup';
-import { getUser } from './database/userQueries';
+import {getUser} from './database/userQueries';
+import ToastManager from 'toastify-react-native'
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,6 @@ function AuthenticatedStack() {
 }
 
 function GuestStack() {
-
   return (
     <Stack.Navigator initialRouteName="Welcome">
       <Stack.Screen name="Welcome" component={Welcome} options={options} />
@@ -40,8 +40,8 @@ function RootNavigator() {
   const {user, loading} = useUser();
 
   if (loading) {
-    return <SplashScreen />
-  };
+    return <SplashScreen />;
+  }
 
   return (
     <NavigationContainer>
@@ -76,6 +76,7 @@ const App = () => {
     <AppProvider>
       <UserProvider>
         <RootNavigator />
+        <ToastManager />
       </UserProvider>
     </AppProvider>
   );

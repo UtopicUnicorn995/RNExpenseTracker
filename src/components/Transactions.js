@@ -1,18 +1,25 @@
 import Colors from '../utility/Colors';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import Button from './Button';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {convertToPeso} from '../utility/utils';
 
 export default Transactions = ({transactions, limit, onViewMore}) => {
-  const [filteredTransactions, setFilteredTransactions] = useState(
-    limit && transactions.length > limit
-      ? [...transactions.slice(0, limit), {type: 'button'}]
-      : transactions,
-  );
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
 
-  console.log('transactions fil', filteredTransactions);
+  useEffect(() => {
+    if (limit && transactions.length > limit) {
+      setFilteredTransactions([
+        ...transactions.slice(0, limit),
+        {type: 'button'},
+      ]);
+    } else {
+      setFilteredTransactions(transactions);
+    }
+  }, [transactions, limit]);
+
+  console.log('transactions fil', filteredTransactions, transactions);
 
   const handleShowMore = () => {
     setFilteredTransactions(transactions);

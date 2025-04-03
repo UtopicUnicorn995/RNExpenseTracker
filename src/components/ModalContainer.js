@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, memo, useEffect} from 'react';
 import {
   View,
   Modal,
@@ -10,10 +10,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import {useApp} from '../AppContext';
+import {useUser} from '../UserContext';
+import {createExpense} from '../database/expenseQueries';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Button from './Button';
 import Colors from '../utility/Colors';
 import FAIcon from 'react-native-vector-icons/FontAwesome';
+import {Toast} from 'toastify-react-native';
 
 const icons = [
   {
@@ -51,14 +55,66 @@ const icons = [
 const screenWidth = Dimensions.get('window').width;
 const modalWidth = screenWidth - 40;
 
-export default function ModalContainer({modalVisible, handleSetModalVisible}) {
-  const [selectedCategory, setSelectedCategory] = useState('');
+const ModalContainer = ({modalVisible, handleSetModalVisible}) => {
+  const {db, apiUrl} = useApp();
+  const {user, refreshData} = useUser();
+
+  console.log('user from the modal', user, user.id)
+  const [expense, setExpense] = useState({userId: user.id});
+
+  useEffect(() => {
+    if (user?.id) {
+      setExpense(prev => ({
+        ...prev,
+        userId: user.id,
+      }));
+    }
+  }, [user?.id]);
 
   const handleSelectCategory = categoryName => {
-    setSelectedCategory(categoryName);
+    handleExpenseData('category', categoryName);
   };
 
-  console.log('selected category', selectedCategory);
+  const handleCreateExpense = async () => {
+    const response = await createExpense(db, apiUrl, expense);
+
+    console.log('response', response, expense)
+
+    if (response === 200) {
+      refreshData();
+      handleSetModalVisible(false);
+      setExpense(prev => ({
+        ...prev,
+        description: '',
+        amount: 0,
+        category: '',
+      }));
+      Toast.success('Expenses successfully created');
+    } else {
+      Toast.error('Error creating expense');
+    }
+  };
+
+  const handleExpenseData = (field, value) => {
+    console.log('amount', expense.amount);
+
+    if (field === 'amount') {
+      const numericValue = value.replace(/[^0-9.]/g, '');
+      if (/^\d*\.?\d*$/.test(numericValue)) {
+        setExpense(prev => ({
+          ...prev,
+          [field]: numericValue,
+        }));
+      } else {
+        console.log('Invalid amount input');
+      }
+    } else {
+      setExpense(prev => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
+  };
 
   return (
     <Modal
@@ -77,7 +133,7 @@ export default function ModalContainer({modalVisible, handleSetModalVisible}) {
               style={styles.keyboardView}>
               <View style={styles.modalContent}>
                 <View>
-                  <Text>I'll add the texes here tomorrow</Text>
+                  <Text>I'll add the textes here tomorrow</Text>
                 </View>
                 <View style={styles.inputContainer}>
                   <Text style={styles.title}>Category</Text>
@@ -89,7 +145,7 @@ export default function ModalContainer({modalVisible, handleSetModalVisible}) {
                           name={icon.name}
                           size={icon.size}
                           color={
-                            icon.name == selectedCategory
+                            icon.name == expense.category
                               ? icon.activeColor
                               : Colors.subTextColor
                           }
@@ -101,18 +157,28 @@ export default function ModalContainer({modalVisible, handleSetModalVisible}) {
                 </View>
                 <View style={styles.inputContainer}>
                   <Text style={styles.title}>Amount</Text>
-                  <TextInput style={styles.input} placeholder="Enter amount" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter amount"
+                    value={expense.amount || ''}
+                    keyboardType="numeric"
+                    onChangeText={text => handleExpenseData('amount', text)}
+                  />
                 </View>
                 <View style={styles.inputContainer}>
                   <Text style={styles.title}>Description</Text>
                   <TextInput
                     style={styles.input}
                     placeholder="Enter description"
+                    value={expense.description || ''}
+                    onChangeText={text =>
+                      handleExpenseData('description', text)
+                    }
                   />
                 </View>
                 <Button
                   style={{borderWidth: 0, backgroundColor: Colors.subTextColor}}
-                  onPress={() => handleSetModalVisible(false)}
+                  onPress={handleCreateExpense}
                   title={'Save'}
                 />
               </View>
@@ -122,7 +188,9 @@ export default function ModalContainer({modalVisible, handleSetModalVisible}) {
       </TouchableWithoutFeedback>
     </Modal>
   );
-}
+};
+
+export default memo(ModalContainer);
 
 const styles = StyleSheet.create({
   overlay: {
