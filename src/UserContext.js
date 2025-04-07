@@ -68,7 +68,7 @@ export const UserProvider = ({children}) => {
     return jwtDecode(token);
   };
 
-  const loginUser = async (username, password) => {
+  const loginUserOrSync = async (username, password) => {
     try {
       if (!db) {
         console.error('Database is not initialized');
@@ -127,7 +127,7 @@ export const UserProvider = ({children}) => {
         setUserData,
         transactions,
         setTransactions,
-        loginUser,
+        loginUserOrSync,
         refreshData,
       }}>
       {children}

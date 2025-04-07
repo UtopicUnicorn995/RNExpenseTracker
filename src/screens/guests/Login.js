@@ -12,7 +12,7 @@ import {jwtDecode} from 'jwt-decode'
 export default function Login({route}) {
   const navigation = useNavigation();
   const canGoBack = navigation.canGoBack();
-  const {loginUser} = useUser()
+  const {loginUserOrSync} = useUser()
 
   const [credentials, setCredentials] = useState({
     username: '',
@@ -28,7 +28,7 @@ export default function Login({route}) {
   };
 
   const handleLogin = () => {
-    loginUser(credentials.username, credentials.password);
+    loginUserOrSync(credentials.username, credentials.password);
   };
 
   return (

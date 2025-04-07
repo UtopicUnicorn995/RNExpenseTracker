@@ -19,6 +19,17 @@ export const createExpense = async (db, apiUrl, queryPayload) => {
       [userId, amount, category, description, state.isConnected ? 1 : 0],
     );
     console.log('Expense saved to local database');
+
+    await db.executeSql(
+      'UPDATE users SET available_balance = available_balance - ? WHERE id = ?',
+      [amount, userId],
+      (tx, results) => {
+        console.log('User balance updated successfully');
+      },
+      (tx, error) => {
+        console.error('Error updating user balance:', error);
+      },
+    );
   } catch (error) {
     console.error('Error saving expense to local database:', error);
     return null;
@@ -45,6 +56,6 @@ export const createExpense = async (db, apiUrl, queryPayload) => {
     }
   } else {
     console.log('Device is offline, expense will be synced later');
-    return 200; 
+    return 200;
   }
 };
